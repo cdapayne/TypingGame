@@ -10,7 +10,7 @@ An interactive, colorful typing game designed to teach and test typing skills, p
 - **Live Statistics** - Track accuracy and words-per-minute (WPM) as you type
 - **Kid-Friendly Design** - Vibrant colors, fun animations, and engaging UI
 - **Progress Tracking** - Automatically saves your best scores for each level
-- **Responsive Design** - Built with Tailwind CSS for a modern look
+- **Responsive Design** - Built with custom CSS for a modern, colorful look
 
 ## 🎯 Level Progression
 
@@ -42,7 +42,7 @@ No installation or build process required - it's pure HTML, CSS, and JavaScript.
 - Large, clear text for easy reading
 - Progress bars and visual indicators
 
-## 💾 Features
+## 💾 Progress Tracking
 
 - Local storage saves your progress
 - Statistics tracking for each level
@@ -52,7 +52,7 @@ No installation or build process required - it's pure HTML, CSS, and JavaScript.
 ## 🛠️ Technology Stack
 
 - HTML5
-- CSS3 with Tailwind CSS
+- CSS3 with custom styling
 - Vanilla JavaScript
 - Local Storage API
 

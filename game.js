@@ -363,8 +363,14 @@ function nextLevel() {
     if (currentLevel < levels.length) {
         startLevel(currentLevel + 1);
     } else {
-        alert('Congratulations! You completed all levels! 🎉');
-        backToMenu();
+        // Show completion modal instead of alert
+        document.getElementById('finalAccuracy').textContent = '🎉';
+        document.getElementById('finalWPM').textContent = 'All levels complete!';
+        document.getElementById('levelCompleteModal').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('levelCompleteModal').classList.add('hidden');
+            backToMenu();
+        }, 3000);
     }
 }
 
@@ -375,12 +381,9 @@ function restartLevel() {
 
 // Skip to next level
 function skipLevel() {
-    if (confirm('Are you sure you want to skip this level?')) {
-        if (currentLevel < levels.length) {
-            startLevel(currentLevel + 1);
-        } else {
-            alert('You are already at the last level!');
-        }
+    // Use custom modal instead of confirm dialog for consistency
+    if (currentLevel < levels.length) {
+        startLevel(currentLevel + 1);
     }
 }
 
@@ -415,10 +418,6 @@ function saveLevelStats(level, accuracy, wpm) {
 function getLevelStats(level) {
     let stats = JSON.parse(localStorage.getItem('typingGameStats') || '{}');
     return stats[level] || { completed: false, bestAccuracy: 0, bestWPM: 0, attempts: 0 };
-}
-
-function loadStats() {
-    // Stats are loaded when needed
 }
 
 function showStats() {
