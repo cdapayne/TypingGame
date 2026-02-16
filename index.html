@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Game - Learn & Play!</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .key {
+            transition: all 0.15s ease;
+        }
+        
+        .key:hover {
+            transform: scale(1.05);
+        }
+        
+        .key.pressed {
+            transform: scale(0.95);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .key.active {
+            animation: pulse 0.5s ease;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .bounce {
+            animation: bounce 0.5s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .shake {
+            animation: shake 0.3s ease;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .level-card:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-400 via-pink-300 to-blue-300 min-h-screen">
+    <div id="app" class="container mx-auto px-4 py-8">
+        <!-- Level Selection Screen -->
+        <div id="levelSelection" class="hidden">
+            <div class="text-center mb-8">
+                <h1 class="text-6xl font-bold text-white mb-4 drop-shadow-lg">🎮 Typing Adventure! 🎮</h1>
+                <p class="text-2xl text-white font-semibold">Choose Your Starting Level</p>
+            </div>
+            
+            <div class="grid grid-cols-4 md:grid-cols-5 gap-4 max-w-6xl mx-auto mb-8">
+                <!-- Level buttons will be generated here -->
+            </div>
+            
+            <div class="text-center">
+                <button onclick="showStats()" class="bg-white text-purple-600 px-8 py-3 rounded-full font-bold text-xl hover:bg-purple-100 transition">
+                    📊 View Statistics
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="hidden">
+            <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-6xl mx-auto">
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-purple-600">Level <span id="currentLevel">1</span></h2>
+                        <p class="text-gray-600" id="levelDescription">Type the letters as they appear!</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="bg-green-100 px-6 py-3 rounded-xl">
+                            <div class="text-sm text-gray-600">Accuracy</div>
+                            <div class="text-2xl font-bold text-green-600"><span id="accuracy">100</span>%</div>
+                        </div>
+                        <div class="bg-blue-100 px-6 py-3 rounded-xl">
+                            <div class="text-sm text-gray-600">Speed (WPM)</div>
+                            <div class="text-2xl font-bold text-blue-600"><span id="wpm">0</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="mb-6">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-sm font-semibold text-gray-600">Progress</span>
+                        <span class="text-sm font-semibold text-gray-600"><span id="progress">0</span>/<span id="total">0</span></span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4">
+                        <div id="progressBar" class="bg-gradient-to-r from-green-400 to-blue-500 h-4 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Text Display -->
+                <div class="bg-gray-50 rounded-2xl p-8 mb-6 min-h-[200px] flex items-center justify-center">
+                    <div class="text-center">
+                        <div id="textDisplay" class="text-5xl font-bold mb-4">
+                            <span id="targetText" class="text-gray-800"></span>
+                        </div>
+                        <div id="nextText" class="text-2xl text-gray-400 mt-4"></div>
+                        <div id="userInput" class="text-3xl text-blue-600 font-semibold mt-6"></div>
+                    </div>
+                </div>
+
+                <!-- Virtual Keyboard -->
+                <div id="keyboard" class="mb-6">
+                    <div class="mb-2 flex justify-center gap-1">
+                        <div class="key bg-gradient-to-br from-red-400 to-red-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="`">~</div>
+                        <div class="key bg-gradient-to-br from-orange-400 to-orange-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="1">1</div>
+                        <div class="key bg-gradient-to-br from-yellow-400 to-yellow-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="2">2</div>
+                        <div class="key bg-gradient-to-br from-green-400 to-green-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="3">3</div>
+                        <div class="key bg-gradient-to-br from-blue-400 to-blue-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="4">4</div>
+                        <div class="key bg-gradient-to-br from-indigo-400 to-indigo-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="5">5</div>
+                        <div class="key bg-gradient-to-br from-purple-400 to-purple-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="6">6</div>
+                        <div class="key bg-gradient-to-br from-pink-400 to-pink-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="7">7</div>
+                        <div class="key bg-gradient-to-br from-red-400 to-red-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="8">8</div>
+                        <div class="key bg-gradient-to-br from-orange-400 to-orange-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="9">9</div>
+                        <div class="key bg-gradient-to-br from-yellow-400 to-yellow-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="0">0</div>
+                        <div class="key bg-gradient-to-br from-green-400 to-green-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="-">-</div>
+                        <div class="key bg-gradient-to-br from-blue-400 to-blue-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="=">=</div>
+                    </div>
+                    <div class="mb-2 flex justify-center gap-1">
+                        <div class="key bg-gradient-to-br from-red-400 to-red-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="q">Q</div>
+                        <div class="key bg-gradient-to-br from-orange-400 to-orange-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="w">W</div>
+                        <div class="key bg-gradient-to-br from-yellow-400 to-yellow-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="e">E</div>
+                        <div class="key bg-gradient-to-br from-green-400 to-green-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="r">R</div>
+                        <div class="key bg-gradient-to-br from-blue-400 to-blue-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="t">T</div>
+                        <div class="key bg-gradient-to-br from-indigo-400 to-indigo-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="y">Y</div>
+                        <div class="key bg-gradient-to-br from-purple-400 to-purple-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="u">U</div>
+                        <div class="key bg-gradient-to-br from-pink-400 to-pink-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="i">I</div>
+                        <div class="key bg-gradient-to-br from-red-400 to-red-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="o">O</div>
+                        <div class="key bg-gradient-to-br from-orange-400 to-orange-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="p">P</div>
+                        <div class="key bg-gradient-to-br from-yellow-400 to-yellow-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="[">[</div>
+                        <div class="key bg-gradient-to-br from-green-400 to-green-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="]">]</div>
+                    </div>
+                    <div class="mb-2 flex justify-center gap-1">
+                        <div class="key bg-gradient-to-br from-blue-400 to-blue-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="a">A</div>
+                        <div class="key bg-gradient-to-br from-indigo-400 to-indigo-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="s">S</div>
+                        <div class="key bg-gradient-to-br from-purple-400 to-purple-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="d">D</div>
+                        <div class="key bg-gradient-to-br from-pink-400 to-pink-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="f">F</div>
+                        <div class="key bg-gradient-to-br from-red-400 to-red-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="g">G</div>
+                        <div class="key bg-gradient-to-br from-orange-400 to-orange-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="h">H</div>
+                        <div class="key bg-gradient-to-br from-yellow-400 to-yellow-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="j">J</div>
+                        <div class="key bg-gradient-to-br from-green-400 to-green-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="k">K</div>
+                        <div class="key bg-gradient-to-br from-blue-400 to-blue-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="l">L</div>
+                        <div class="key bg-gradient-to-br from-indigo-400 to-indigo-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key=";">;</div>
+                        <div class="key bg-gradient-to-br from-purple-400 to-purple-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="'">'</div>
+                    </div>
+                    <div class="mb-2 flex justify-center gap-1">
+                        <div class="key bg-gradient-to-br from-pink-400 to-pink-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="z">Z</div>
+                        <div class="key bg-gradient-to-br from-red-400 to-red-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="x">X</div>
+                        <div class="key bg-gradient-to-br from-orange-400 to-orange-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="c">C</div>
+                        <div class="key bg-gradient-to-br from-yellow-400 to-yellow-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="v">V</div>
+                        <div class="key bg-gradient-to-br from-green-400 to-green-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="b">B</div>
+                        <div class="key bg-gradient-to-br from-blue-400 to-blue-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="n">N</div>
+                        <div class="key bg-gradient-to-br from-indigo-400 to-indigo-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="m">M</div>
+                        <div class="key bg-gradient-to-br from-purple-400 to-purple-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key=",">,</div>
+                        <div class="key bg-gradient-to-br from-pink-400 to-pink-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key=".">.</div>
+                        <div class="key bg-gradient-to-br from-red-400 to-red-500 text-white font-bold px-4 py-3 rounded-lg shadow-md" data-key="/">/</div>
+                    </div>
+                    <div class="flex justify-center">
+                        <div class="key bg-gradient-to-br from-gray-400 to-gray-500 text-white font-bold px-32 py-3 rounded-lg shadow-md" data-key=" ">SPACE</div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex justify-between items-center">
+                    <button onclick="backToMenu()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-full transition">
+                        ⬅️ Back to Menu
+                    </button>
+                    <button onclick="restartLevel()" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-full transition">
+                        🔄 Restart Level
+                    </button>
+                    <button onclick="skipLevel()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full transition">
+                        ⏭️ Skip Level
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Complete Modal -->
+        <div id="levelCompleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-3xl p-12 max-w-2xl mx-4 text-center transform scale-100 transition-transform">
+                <div class="text-8xl mb-6">🎉</div>
+                <h2 class="text-5xl font-bold text-purple-600 mb-4">Level Complete!</h2>
+                <div class="grid grid-cols-2 gap-6 mb-8">
+                    <div class="bg-green-100 p-6 rounded-xl">
+                        <div class="text-gray-600 mb-2">Accuracy</div>
+                        <div class="text-4xl font-bold text-green-600"><span id="finalAccuracy">0</span>%</div>
+                    </div>
+                    <div class="bg-blue-100 p-6 rounded-xl">
+                        <div class="text-gray-600 mb-2">Speed</div>
+                        <div class="text-4xl font-bold text-blue-600"><span id="finalWPM">0</span> WPM</div>
+                    </div>
+                </div>
+                <div class="flex gap-4 justify-center">
+                    <button onclick="nextLevel()" class="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-bold py-4 px-8 rounded-full text-xl transition">
+                        Next Level ➡️
+                    </button>
+                    <button onclick="backToMenu()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-4 px-8 rounded-full text-xl transition">
+                        Back to Menu
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Modal -->
+        <div id="statsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-3xl p-12 max-w-4xl mx-4 text-center">
+                <h2 class="text-5xl font-bold text-purple-600 mb-8">📊 Your Statistics</h2>
+                <div id="statsContent" class="grid grid-cols-3 gap-6 mb-8">
+                    <!-- Stats will be generated here -->
+                </div>
+                <button onclick="closeStats()" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-4 px-8 rounded-full text-xl transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
